@@ -17,9 +17,32 @@ if test -f ~/.cache/ags/user/generated/terminal/sequences.txt
     cat ~/.cache/ags/user/generated/terminal/sequences.txt
 end
 
+
 alias pamcan=pacman
+alias pn=pnpm
+
+# Git aliases
+alias gst='git status'
+alias gco='git checkout'
+alias gcm='git commit -m'
+alias gcb='git checkout -b'
+
+# Zypper aliases
+alias zy='sudo zypper refresh'
+alias zyin='sudo zypper in'
+alias zyrm='sudo zypper rm'
+alias zyup='sudo zypper up'
+alias zydup='sudo zypper dup'
+
+alias hbi='cd ~/Documentos/hbi/'
+alias apibankop='cd ~/Documentos/hbi/api-bankop/'
+alias pipenv=~/.local/share/python/bin/pip3
+
+export PNPM_HOME="/home/lucas/.local/share/pnpm"
+
 
 # function fish_prompt
 #   set_color cyan; echo (pwd)
 #   set_color green; echo '> '
 # end
+~/.local/bin/mise activate fish | source
