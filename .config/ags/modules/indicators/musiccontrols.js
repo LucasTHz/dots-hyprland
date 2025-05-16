@@ -4,18 +4,17 @@ import Widget from 'resource:///com/github/Aylur/ags/widget.js';
 import * as Utils from 'resource:///com/github/Aylur/ags/utils.js';
 import Mpris from 'resource:///com/github/Aylur/ags/service/mpris.js';
 const { exec, execAsync } = Utils;
-const { Box, EventBox, Icon, Scrollable, Label, Button, Revealer } = Widget;
+const { Box, Label, Button, Revealer } = Widget;
 
 import { fileExists } from '../.miscutils/files.js';
 import { AnimatedCircProg } from "../.commonwidgets/cairo_circularprogress.js";
 import { showMusicControls } from '../../variables.js';
 import { darkMode, hasPlasmaIntegration } from '../.miscutils/system.js';
-import { setupCursorHover } from '../.widgetutils/cursorhover.js';
 
 const COMPILED_STYLE_DIR = `${GLib.get_user_cache_dir()}/ags/user/generated`
 const LIGHTDARK_FILE_LOCATION = `${GLib.get_user_state_dir()}/ags/user/colormode.txt`;
 const colorMode = Utils.exec(`bash -c "sed -n \'1p\' '${LIGHTDARK_FILE_LOCATION}'"`);
-const lightDark = (colorMode == "light") ? 'light' : '';
+const lightDark = (colorMode == "light") ? '-l' : '';
 const COVER_COLORSCHEME_SUFFIX = '_colorscheme.css';
 var lastCoverPath = '';
 
@@ -134,49 +133,6 @@ const CoverArt = ({ player, ...rest }) => {
         // children: [coverArtDrawingArea],
         attribute: {
             'pixbuf': null,
-            // 'showImage': (self, imagePath) => {
-            //     const borderRadius = coverArtDrawingAreaStyleContext.get_property('border-radius', Gtk.StateFlags.NORMAL);
-            //     const frameHeight = coverArtDrawingAreaStyleContext.get_property('min-height', Gtk.StateFlags.NORMAL);
-            //     const frameWidth = coverArtDrawingAreaStyleContext.get_property('min-width', Gtk.StateFlags.NORMAL);
-            //     let imageHeight = frameHeight;
-            //     let imageWidth = frameWidth;
-            //     // Get image dimensions
-            //     execAsync(['identify', '-format', '{"w":%w,"h":%h}', imagePath])
-            //         .then((output) => {
-            //             const imageDimensions = JSON.parse(output);
-            //             const imageAspectRatio = imageDimensions.w / imageDimensions.h;
-            //             const displayedAspectRatio = imageWidth / imageHeight;
-            //             if (imageAspectRatio >= displayedAspectRatio) {
-            //                 imageWidth = imageHeight * imageAspectRatio;
-            //             } else {
-            //                 imageHeight = imageWidth / imageAspectRatio;
-            //             }
-            //             // Real stuff
-            //             // TODO: fix memory leak(?)
-            //             // if (self.attribute.pixbuf) {
-            //             //     self.attribute.pixbuf.unref();
-            //             //     self.attribute.pixbuf = null;
-            //             // }
-            //             self.attribute.pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(imagePath, imageWidth, imageHeight);
-
-            //             coverArtDrawingArea.set_size_request(frameWidth, frameHeight);
-            //             coverArtDrawingArea.connect("draw", (widget, cr) => {
-            //                 // Clip a rounded rectangle area
-            //                 cr.arc(borderRadius, borderRadius, borderRadius, Math.PI, 1.5 * Math.PI);
-            //                 cr.arc(frameWidth - borderRadius, borderRadius, borderRadius, 1.5 * Math.PI, 2 * Math.PI);
-            //                 cr.arc(frameWidth - borderRadius, frameHeight - borderRadius, borderRadius, 0, 0.5 * Math.PI);
-            //                 cr.arc(borderRadius, frameHeight - borderRadius, borderRadius, 0.5 * Math.PI, Math.PI);
-            //                 cr.closePath();
-            //                 cr.clip();
-            //                 // Paint image as bg, centered
-            //                 Gdk.cairo_set_source_pixbuf(cr, self.attribute.pixbuf,
-            //                     frameWidth / 2 - imageWidth / 2,
-            //                     frameHeight / 2 - imageHeight / 2
-            //                 );
-            //                 cr.paint();
-            //             });
-            //         }).catch(print)
-            // },
             'updateCover': (self) => {
                 // const player = Mpris.getPlayer(); // Maybe no need to re-get player.. can't remember why I had this
                 // Player closed
@@ -191,7 +147,6 @@ const CoverArt = ({ player, ...rest }) => {
                 const stylePath = `${player.coverPath}${darkMode.value ? '' : '-l'}${COVER_COLORSCHEME_SUFFIX}`;
                 if (player.coverPath == lastCoverPath) { // Since 'notify::cover-path' emits on cover download complete
                     Utils.timeout(200, () => {
-                        // self.attribute.showImage(self, coverPath);
                         self.css = `background-image: url('${coverPath}');`; // CSS image
                     });
                 }
@@ -199,7 +154,6 @@ const CoverArt = ({ player, ...rest }) => {
 
                 // If a colorscheme has already been generated, skip generation
                 if (fileExists(stylePath)) {
-                    // self.attribute.showImage(self, coverPath)
                     self.css = `background-image: url('${coverPath}');`; // CSS image
                     App.applyCss(stylePath);
                     return;
@@ -209,11 +163,10 @@ const CoverArt = ({ player, ...rest }) => {
                 execAsync(['bash', '-c',
                     `${App.configDir}/scripts/color_generation/generate_colors_material.py --path '${coverPath}' --mode ${darkMode.value ? 'dark' : 'light'} > ${GLib.get_user_state_dir()}/ags/scss/_musicmaterial.scss`])
                     .then(() => {
-                        exec(`${App.configDir}/scripts/color_generation/pywal.sh -i "${player.coverPath}" -n -t -s -e -q ${darkMode.value ? '' : '-l'}`)
+                        exec(`wal -i "${player.coverPath}" -n -t -s -e -q ${darkMode.value ? '' : '-l'}`)
                         exec(`cp ${GLib.get_user_cache_dir()}/wal/colors.scss ${GLib.get_user_state_dir()}/ags/scss/_musicwal.scss`);
                         exec(`sass -I "${GLib.get_user_state_dir()}/ags/scss" -I "${App.configDir}/scss/fallback" "${App.configDir}/scss/_music.scss" "${stylePath}"`);
                         Utils.timeout(200, () => {
-                            // self.attribute.showImage(self, coverPath)
                             self.css = `background-image: url('${coverPath}');`; // CSS image
                         });
                         App.applyCss(`${stylePath}`);
@@ -254,8 +207,7 @@ const TrackControls = ({ player, ...rest }) => Widget.Revealer({
                 child: Label({
                     className: 'icon-material osd-music-controlbtn-txt',
                     label: 'skip_previous',
-                }),
-                setup: setupCursorHover
+                })
             }),
             Button({
                 className: 'osd-music-controlbtn',
@@ -263,8 +215,7 @@ const TrackControls = ({ player, ...rest }) => Widget.Revealer({
                 child: Label({
                     className: 'icon-material osd-music-controlbtn-txt',
                     label: 'skip_next',
-                }),
-                setup: setupCursorHover
+                })
             }),
         ],
     }),
@@ -358,11 +309,10 @@ const PlayState = ({ player }) => {
                             label.label = `${player.playBackStatus == 'Playing' ? 'pause' : 'play_arrow'}`;
                         }, 'notify::play-back-status'),
                     }),
-                    setup: setupCursorHover
                 }),
             ],
             passThrough: true,
-        }),
+        })
     });
 }
 

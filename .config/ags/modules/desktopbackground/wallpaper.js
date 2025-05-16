@@ -1,10 +1,8 @@
-const { Gdk, GdkPixbuf, Gio, GLib, Gtk } = imports.gi;
+const { Gdk, GdkPixbuf, Gtk } = imports.gi;
 import Widget from 'resource:///com/github/Aylur/ags/widget.js';
 import * as Utils from 'resource:///com/github/Aylur/ags/utils.js';
-const { exec, execAsync } = Utils;
 const { Box, Button, Label, Stack } = Widget;
 import Hyprland from 'resource:///com/github/Aylur/ags/service/hyprland.js';
-
 import Wallpaper from '../../services/wallpaper.js';
 import { setupCursorHover } from '../.widgetutils/cursorhover.js';
 import { clamp } from '../.miscutils/mathfuncs.js';
@@ -24,26 +22,15 @@ export default (monitor = 0) => {
             pixbuf: undefined,
             workspace: 1,
             sideleft: 0,
-            sideright: 0,
+            dashboard: 0,
             updatePos: (self) => {
-                self.setCss(`font-size: ${self.attribute.workspace - self.attribute.sideleft + self.attribute.sideright}px;`)
+                self.setCss(`font-size: ${self.attribute.workspace - self.attribute.sideleft + self.attribute.dashboard}px;`)
             },
         },
         className: 'bg-wallpaper-transition',
         setup: (self) => {
             self.set_size_request(monitors[monitor].width, monitors[monitor].height);
-            self
-                // TODO: reduced updates using timeouts to reduce lag
-                // .hook(Hyprland.active.workspace, (self) => {
-                //     self.attribute.workspace = Hyprland.active.workspace.id
-                //     self.attribute.updatePos(self);
-                // })
-                // .hook(App, (box, name, visible) => { // Update on open
-                //     if (self.attribute[name] === undefined) return;
-                //     self.attribute[name] = (visible ? 1 : 0);
-                //     self.attribute.updatePos(self);
-                // })
-                .on('draw', (self, cr) => {
+            self.on('draw', (self, cr) => {
                     if (!self.attribute.pixbuf) return;
                     const styleContext = self.get_style_context();
                     const workspace = styleContext.get_property('font-size', Gtk.StateFlags.NORMAL);

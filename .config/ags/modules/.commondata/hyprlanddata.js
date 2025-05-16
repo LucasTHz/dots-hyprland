@@ -1,6 +1,6 @@
 const { Gdk } = imports.gi;
 import * as Utils from 'resource:///com/github/Aylur/ags/utils.js';
-const { execAsync, exec } = Utils;
+const { exec } = Utils;
 
 export let monitors;
 
@@ -17,14 +17,8 @@ async function updateStuff() {
             monitor.height = gdkMonitor.get_geometry().height;
         }
         else { // == "division"
-            if (monitor.transform % 2 == 1) { // Vertical monitors (or horizontal monitor that's vertical by default...)
-                monitor.width = Math.floor(monitor.realHeight / monitor.scale);
-                monitor.height = Math.floor(monitor.realWidth / monitor.scale);
-            }
-            else {
-                monitor.width = Math.ceil(monitor.realWidth / monitor.scale);
-                monitor.height = Math.ceil(monitor.realHeight / monitor.scale);
-            }
+            monitor.width = Math.ceil(monitor.realWidth / monitor.scale);
+            monitor.height = Math.ceil(monitor.realHeight / monitor.scale);
         }
     });
 }

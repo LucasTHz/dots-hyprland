@@ -35,7 +35,8 @@ export const MicMuteIndicator = () => Widget.Revealer({
     child: MaterialIcon('mic_off', 'norm'),
 });
 
-export const NotificationIndicator = (notifCenterName = 'sideright') => {
+
+export const NotificationIndicator = (notifCenterName = 'dashboard') => {
     const widget = Widget.Revealer({
         transition: 'slide_left',
         transitionDuration: userOptions.animations.durationSmall,
@@ -86,20 +87,14 @@ export const BluetoothIndicator = () => Widget.Stack({
     transition: 'slide_up_down',
     transitionDuration: userOptions.animations.durationSmall,
     children: {
-        'disabled': Widget.Label({ className: 'txt-norm icon-material', label: 'bluetooth_disabled' }),
-        'enabled': Widget.Label({ className: 'txt-norm icon-material', label: 'bluetooth' }),
-        'connected': Widget.Label({ className: 'txt-norm icon-material', label: 'bluetooth_connected' }),
+        'false': Widget.Label({ className: 'txt-norm icon-material', label: 'bluetooth_disabled' }),
+        'true': Widget.Label({ className: 'txt-norm icon-material', label: 'bluetooth' }),
     },
-    setup: (self) =>
-        self.hook(Bluetooth, (stack) => {
-            if (!Bluetooth.enabled) {
-                stack.shown = 'disabled';
-            } else if (Bluetooth.connected_devices.length === 0) {
-                stack.shown = 'enabled';
-            } else if (Bluetooth.connected_devices.length > 0) {
-                stack.shown = 'connected';
-            }
-        }),
+    setup: (self) => self
+        .hook(Bluetooth, stack => {
+            stack.shown = String(Bluetooth.enabled);
+        })
+    ,
 });
 
 const BluetoothDevices = () => Widget.Box({
@@ -164,11 +159,8 @@ const NetworkWifiIndicator = () => Widget.Stack({
     transition: 'slide_up_down',
     transitionDuration: userOptions.animations.durationSmall,
     children: {
-        'disabled': Widget.Label({ className: 'txt-norm icon-material', label: 'signal_wifi_off' }),
-		'disconnected': Widget.Label({
-			className: 'txt-norm icon-material',
-			label: 'signal_wifi_statusbar_not_connected',
-		}),
+        'disabled': Widget.Label({ className: 'txt-norm icon-material', label: 'wifi_off' }),
+        'disconnected': Widget.Label({ className: 'txt-norm icon-material', label: 'signal_wifi_off' }),
         'connecting': Widget.Label({ className: 'txt-norm icon-material', label: 'settings_ethernet' }),
         '0': Widget.Label({ className: 'txt-norm icon-material', label: 'signal_wifi_0_bar' }),
         '1': Widget.Label({ className: 'txt-norm icon-material', label: 'network_wifi_1_bar' }),
@@ -180,12 +172,41 @@ const NetworkWifiIndicator = () => Widget.Stack({
         if (!Network.wifi) {
             return;
         }
-        if (!Network.wifi.enabled) {
-            stack.shown = 'disabled';
-        } else if (Network.wifi.internet == 'connected') {
+        if (Network.wifi.internet == 'connected') {
             stack.shown = String(Math.ceil(Network.wifi.strength / 25));
-        } else if (['disconnected', 'connecting'].includes(Network.wifi.internet)) {
+        }
+        else if (["disconnected", "connecting"].includes(Network.wifi.internet)) {
             stack.shown = Network.wifi.internet;
+        }
+    }),
+});
+
+
+export const AudioWidget = () => Widget.Stack({
+    transition: 'slide_up_down',
+    transitionDuration: userOptions.animations.durationSmall,
+    children: {
+        'fallback': Widget.Label({ className: 'txt-norm icon-material', label: 'no_sound' }),
+        'mute': Widget.Label({ className: 'txt-norm icon-material', label: 'volume_off' }),
+        '0': Widget.Label({ className: 'txt-norm icon-material', label: 'volume_off' }),
+        '1': Widget.Label({ className: 'txt-norm icon-material', label: 'volume_down' }),
+        '2': Widget.Label({ className: 'txt-norm icon-material', label: 'volume_up' }),
+    },
+    setup: (self) => self.hook(Audio, (stack) => {
+        let value = Math.round(Audio.speaker?.volume * 100);
+        // console.log(`Volume: ${value}`);
+        if (value === undefined || value === null) {
+            stack.shown = 'fallback';
+            return;
+        } else if (value === 0 || Audio.speaker?.stream?.isMuted) {
+            stack.shown = 'mute';
+            return;
+        } else {
+            if (value > 1 && value < 50) {
+                stack.shown = '1';
+            } else if (value >= 50) {
+                stack.shown = '2';
+            }
         }
     }),
 });
@@ -307,6 +328,7 @@ export const StatusIcons = (props = {}, monitor = 0) => Widget.Box({
             optionalKeyboardLayoutInstances[monitor],
             NotificationIndicator(),
             NetworkIndicator(),
+            AudioWidget(),
             Widget.Box({
                 className: 'spacing-h-5',
                 children: [BluetoothIndicator(), BluetoothDevices()]

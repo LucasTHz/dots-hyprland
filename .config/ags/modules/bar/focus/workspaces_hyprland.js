@@ -1,8 +1,5 @@
-const { GLib, Gdk, Gtk } = imports.gi;
+const { Gdk, Gtk } = imports.gi;
 const Lang = imports.lang;
-const Cairo = imports.cairo;
-const Pango = imports.gi.Pango;
-const PangoCairo = imports.gi.PangoCairo;
 import App from 'resource:///com/github/Aylur/ags/app.js';
 import * as Utils from 'resource:///com/github/Aylur/ags/utils.js'
 import Widget from 'resource:///com/github/Aylur/ags/widget.js';
@@ -170,9 +167,8 @@ const WorkspaceContents = (count = 10) => {
 }
 
 export default () => EventBox({
-    onScrollUp: () => Hyprland.messageAsync(`dispatch workspace r-1`).catch(print),
-    onScrollDown: () => Hyprland.messageAsync(`dispatch workspace r+1`).catch(print),
-    onMiddleClick: () => toggleWindowOnAllMonitors('osk'),
+    onScrollUp: () => Hyprland.messageAsync(`dispatch workspace -1`).catch(print),
+    onScrollDown: () => Hyprland.messageAsync(`dispatch workspace +1`).catch(print),
     onSecondaryClick: () => App.toggleWindow('overview'),
     attribute: {
         clicked: false,
@@ -182,7 +178,7 @@ export default () => EventBox({
         homogeneous: true,
         // className: 'bar-group-margin',
         children: [Box({
-            // className: `bar-group${userOptions.appearance.borderless ? '-borderless' : ''} bar-group-standalone bar-group-pad`,
+            // className: 'bar-group bar-group-standalone bar-group-pad',
             css: 'min-width: 2px;',
             children: [WorkspaceContents(userOptions.workspaces.shown)],
         })]

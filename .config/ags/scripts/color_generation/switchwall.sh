@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
-CONFIG_DIR="$XDG_CONFIG_HOME/ags"
+CONFIG_DIR="/usr/share/sleex"
 
 switch() {
 	imgpath=$1
@@ -17,22 +17,32 @@ switch() {
 		exit 0
 	fi
 
-	# agsv1 run-js "wallpaper.set('')"
-	# sleep 0.1 && agsv1 run-js "wallpaper.set('${imgpath}')" &
+	# ags run-js "wallpaper.set('')"
+	# sleep 0.1 && ags run-js "wallpaper.set('${imgpath}')" &
 	swww img "$imgpath" --transition-step 100 --transition-fps 120 \
 		--transition-type grow --transition-angle 30 --transition-duration 1 \
 		--transition-pos "$cursorposx, $cursorposy_inverted"
 }
 
-if [ "$1" == "--noswitch" ]; then
+imgpath=""
+
+while [[ "$#" -gt 0 ]]; do
+	case $1 in
+		--noswitch) noswitch=true ;;
+		--path) imgpath="$2"; shift ;;
+		*) imgpath="$1" ;;
+	esac
+	shift
+done
+
+if [ "$noswitch" == true ]; then
 	imgpath=$(swww query | awk -F 'image: ' '{print $2}')
-	# imgpath=$(agsv1 run-js 'wallpaper.get(0)')
-elif [[ "$1" ]]; then
-	switch "$1"
+	# imgpath=$(ags run-js 'wallpaper.get(0)')
+elif [[ "$imgpath" ]]; then
+	switch "$imgpath"
 else
 	# Select and set image (hyprland)
-
-    cd "$(xdg-user-dir PICTURES)/Wallpapers" || cd "$(xdg-user-dir PICTURES)" || return 1
+	cd "$(xdg-user-dir PICTURES)" || return 1
 	switch "$(yad --width 1200 --height 800 --file --add-preview --large-preview --title='Choose wallpaper')"
 fi
 

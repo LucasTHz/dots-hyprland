@@ -1,4 +1,4 @@
-const { GLib, Gdk, Gtk } = imports.gi;
+const { Gdk, Gtk } = imports.gi;
 const Lang = imports.lang;
 const Cairo = imports.cairo;
 const Pango = imports.gi.Pango;
@@ -6,7 +6,7 @@ const PangoCairo = imports.gi.PangoCairo;
 import Widget from "resource:///com/github/Aylur/ags/widget.js";
 import Sway from "../../../services/sway.js";
 import * as Utils from "resource:///com/github/Aylur/ags/utils.js";
-const { execAsync, exec } = Utils;
+const { execAsync } = Utils;
 const { Box, DrawingArea, EventBox } = Widget;
 
 const dummyWs = Box({ className: 'bar-ws' }); // Not shown. Only for getting size props
@@ -147,14 +147,13 @@ const WorkspaceContents = (count = 10) => {
 export default () => EventBox({
     onScrollUp: (self) => switchToRelativeWorkspace(self, -1),
     onScrollDown: (self) => switchToRelativeWorkspace(self, +1),
-    onMiddleClick: () => toggleWindowOnAllMonitors('osk'),
     onSecondaryClick: () => App.toggleWindow('overview'),
     attribute: { clicked: false },
     child: Box({
         homogeneous: true,
         className: 'bar-group-margin',
         children: [Box({
-            className: `bar-group${userOptions.appearance.borderless ? '-borderless' : ''} bar-group-standalone bar-group-pad`,
+            className: 'bar-group bar-group-standalone bar-group-pad',
             css: 'min-width: 2px;',
             children: [
                 WorkspaceContents(10),

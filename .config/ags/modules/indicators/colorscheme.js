@@ -1,4 +1,4 @@
-const { Gio, GLib } = imports.gi;
+const { GLib } = imports.gi;
 import Variable from 'resource:///com/github/Aylur/ags/variable.js';
 import Widget from 'resource:///com/github/Aylur/ags/widget.js';
 import { ConfigToggle, ConfigMulipleSelection } from '../.commonwidgets/configwidgets.js';
@@ -78,22 +78,22 @@ function calculateSchemeInitIndex(optionsArr, searchValue = 'vibrant') {
 
 const schemeOptionsArr = [
     [
-        { name: getString('Tonal Spot'), value: 'tonalspot' },
-        { name: getString('Fruit Salad'), value: 'fruitsalad' },
-        { name: getString('Fidelity'), value: 'fidelity' },
-        { name: getString('Rainbow'), value: 'rainbow' },
+        { name: 'Tonal Spot', value: 'tonalspot' },
+        { name: 'Fruit Salad', value: 'fruitsalad' },
+        { name: 'Fidelity', value: 'fidelity' },
+        { name: 'Rainbow', value: 'rainbow' },
     ],
     [
-        { name: getString('Neutral'), value: 'neutral' },
-        { name: getString('Monochrome'), value: 'monochrome' },
-        { name: getString('Expressive'), value: 'expressive' },
-        { name: getString('Vibrant'), value: 'vibrant' },
+        { name: 'Neutral', value: 'neutral' },
+        { name: 'Monochrome', value: 'monochrome' },
+        { name: 'Expressive', value: 'expressive' },
+        { name: 'Vibrant', value: 'vibrant' },
     ],
     [
-        { name: getString('Vibrant+'), value: 'morevibrant' },
+        { name: 'Vibrant+', value: 'morevibrant' },
     ],
     //[
-    //  { name: getString('Content'), value: 'content' },
+    //  { name: 'Content', value: 'content' },
     //]
 ];
 
@@ -114,26 +114,26 @@ const ColorSchemeSettings = () => Widget.Box({
                 Widget.Label({
                     xalign: 0,
                     className: 'txt-norm titlefont txt',
-                    label: getString('Options'),
+                    label: 'Options',
                     hpack: 'center',
                 }),
                 //////////////////
                 ConfigToggle({
                     icon: 'dark_mode',
-                    name: getString('Dark Mode'),
-                    desc: getString('Ya should go to sleep!'),
+                    name: 'Dark Mode',
+                    desc: 'Ya should go to sleep!',
                     initValue: darkMode.value,
                     onChange: (_, newValue) => {
                         darkMode.value = !!newValue;
                     },
                     extraSetup: (self) => self.hook(darkMode, (self) => {
-                        self.attribute.enabled.value = darkMode.value;
+                        self.enabled.value = darkMode.value;
                     }),
                 }),
                 ConfigToggle({
                     icon: 'border_clear',
-                    name: getString('Transparency'),
-                    desc: getString('Make shell elements transparent'),
+                    name: 'Transparency',
+                    desc: 'Make shell elements transparent',
                     initValue: initTransparencyVal,
                     onChange: (self, newValue) => {
                         let transparency = newValue == 0 ? "opaque" : "transparent";
@@ -151,7 +151,7 @@ const ColorSchemeSettings = () => Widget.Box({
                 Widget.Label({
                     xalign: 0,
                     className: 'txt-norm titlefont txt margin-top-5',
-                    label: getString('Scheme styles'),
+                    label: 'Scheme styles',
                     hpack: 'center',
                 }),
                 //////////////////
@@ -179,7 +179,7 @@ const ColorschemeContent = () => Widget.Box({
         Widget.Label({
             xalign: 0,
             className: 'txt-norm titlefont txt',
-            label: getString('Color scheme'),
+            label: 'Color scheme',
             hpack: 'center',
         }),
         Widget.Box({

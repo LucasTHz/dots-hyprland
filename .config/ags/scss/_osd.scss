@@ -9,7 +9,7 @@
 .osd-value {
     @include elevation-border;
     @include elevation2;
-    @include full-rounding;
+    @include small-rounding;
     background-color: $layer0;
     padding: 0.341rem 1.023rem 0.341rem 0.682rem;
     min-width: 9.545rem;

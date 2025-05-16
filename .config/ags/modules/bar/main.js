@@ -1,20 +1,32 @@
-const { Gtk } = imports.gi;
+const { Gtk, GLib } = imports.gi;
 import Widget from 'resource:///com/github/Aylur/ags/widget.js';
 import Battery from 'resource:///com/github/Aylur/ags/service/battery.js';
-
+const { execAsync, exec } = Utils;
+import { MaterialIcon } from '../.commonwidgets/materialicon.js';
 import WindowTitle from "./normal/spaceleft.js";
 import Indicators from "./normal/spaceright.js";
-import Music from "./normal/music.js";
+import Monitor from "./normal/monitor.js";
 import System from "./normal/system.js";
-import { enableClickthrough } from "../.widgetutils/clickthrough.js";
-import { RoundedCorner } from "../.commonwidgets/cairo_roundedcorner.js";
+// import Music from "./normal/music.js";
+// import Weather from './normal/weather.js';
 import { currentShellMode } from '../../variables.js';
+import { RoundedCorner } from "../.commonwidgets/cairo_roundedcorner.js";
+
+const ShowWorkspaces = () => {
+    const WORKSPACE_FILE_LOCATION = `${GLib.get_user_state_dir()}/ags/user/show_workspaces.txt`;
+    const actual_show_workspaces = exec(`bash -c "cat ${WORKSPACE_FILE_LOCATION}"`);
+    actual_show_workspaces == null ? actual_show_workspaces = userOptions.appearance.showWorkspace : actual_show_workspaces;
+    return actual_show_workspaces == 'true' ? true : false;
+}
+
 
 const NormalOptionalWorkspaces = async () => {
     try {
+        if (!ShowWorkspaces()) return null;
         return (await import('./normal/workspaces_hyprland.js')).default();
     } catch {
         try {
+            if (!ShowWorkspaces()) return null;
             return (await import('./normal/workspaces_sway.js')).default();
         } catch {
             return null;
@@ -35,27 +47,20 @@ const FocusOptionalWorkspaces = async () => {
 };
 
 export const Bar = async (monitor = 0) => {
-    const SideModule = (children) => Widget.Box({
-        className: 'bar-sidemodule',
-        children: children,
-    });
+    
     const normalBarContent = Widget.CenterBox({
-        className: 'bar-bg',
-        setup: (self) => {
-            const styleContext = self.get_style_context();
-            const minHeight = styleContext.get_property('min-height', Gtk.StateFlags.NORMAL);
-            // execAsync(['bash', '-c', `hyprctl keyword monitor ,addreserved,${minHeight},0,0,0`]).catch(print);
-        },
+        // className: 'bar-bg',
         startWidget: (await WindowTitle(monitor)),
         centerWidget: Widget.Box({
-            className: 'spacing-h-4',
+            className: 'bar-center', // Center bar
             children: [
-                SideModule([Music()]),
-                Widget.Box({
-                    homogeneous: true,
-                    children: [await NormalOptionalWorkspaces()],
-                }),
-                SideModule([System()]),
+                Monitor(),
+                // Music(),
+                BarCornerTopleft(),
+                await NormalOptionalWorkspaces(),
+                BarCornerTopright(),
+                System(),
+                // Weather(),
             ]
         }),
         endWidget: Indicators(monitor),
@@ -66,12 +71,10 @@ export const Bar = async (monitor = 0) => {
         centerWidget: Widget.Box({
             className: 'spacing-h-4',
             children: [
-                SideModule([]),
                 Widget.Box({
                     homogeneous: true,
                     children: [await FocusOptionalWorkspaces()],
                 }),
-                SideModule([]),
             ]
         }),
         endWidget: Widget.Box({}),
@@ -87,13 +90,14 @@ export const Bar = async (monitor = 0) => {
     })
     return Widget.Window({
         monitor,
+        className: 'bar-bg', // Full bar
         name: `bar${monitor}`,
         anchor: ['top', 'left', 'right'],
         exclusivity: 'exclusive',
         visible: true,
         child: Widget.Stack({
             homogeneous: false,
-            transition: 'slide_up_down',
+            transition: "slide_down",
             transitionDuration: userOptions.animations.durationLarge,
             children: {
                 'normal': normalBarContent,
@@ -107,23 +111,19 @@ export const Bar = async (monitor = 0) => {
     });
 }
 
-export const BarCornerTopleft = (monitor = 0) => Widget.Window({
-    monitor,
-    name: `barcornertl${monitor}`,
-    layer: 'top',
-    anchor: ['top', 'left'],
-    exclusivity: 'normal',
-    visible: true,
+const BarCornerTopleft = () => Widget.Box({
     child: RoundedCorner('topleft', { className: 'corner', }),
-    setup: enableClickthrough,
+    setup: (self) => {
+        if (!ShowWorkspaces()) {
+            self.child = Widget.Box({});
+        }
+    }
 });
-export const BarCornerTopright = (monitor = 0) => Widget.Window({
-    monitor,
-    name: `barcornertr${monitor}`,
-    layer: 'top',
-    anchor: ['top', 'right'],
-    exclusivity: 'normal',
-    visible: true,
+const BarCornerTopright = () => Widget.Box({
     child: RoundedCorner('topright', { className: 'corner', }),
-    setup: enableClickthrough,
+    setup: (self) => {
+        if (!ShowWorkspaces()) {
+            self.child = Widget.Box({});
+        }
+    }
 });

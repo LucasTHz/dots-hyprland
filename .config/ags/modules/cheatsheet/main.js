@@ -6,18 +6,24 @@ import PeriodicTable from "./periodictable.js";
 import { ExpandingIconTabContainer } from '../.commonwidgets/tabcontainer.js';
 import { checkKeybind } from '../.widgetutils/keybind.js';
 import clickCloseRegion from '../.commonwidgets/clickcloseregion.js';
+//import GlobalInfo from './globalinfo.js'; // Not implemented yet
 
 const cheatsheets = [
     {
-        name: getString('Keybinds'),
+        name: 'Keybinds',
         materialIcon: 'keyboard',
         contentWidget: Keybinds,
     },
     {
-        name: getString('Periodic table'),
+        name: 'Periodic table',
         materialIcon: 'experiment',
         contentWidget: PeriodicTable,
     },
+    //{
+    //    name: 'Global info',
+    //    materialIcon: 'info',
+    //    contentWidget: GlobalInfo,
+    //}
 ];
 
 const CheatsheetHeader = () => Widget.CenterBox({
@@ -35,7 +41,7 @@ const CheatsheetHeader = () => Widget.CenterBox({
                         hpack: 'center',
                         css: 'margin-right: 0.682rem;',
                         className: 'txt-title',
-                        label: getString('Cheat sheet'),
+                        label: 'Cheat sheet',
                     }),
                     Widget.Label({
                         vpack: 'center',

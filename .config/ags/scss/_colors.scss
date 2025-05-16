@@ -7,14 +7,21 @@ $transparency: 0.75;
   $surface: transparentize($surface, $transparency);
   $surfaceDim: transparentize($surfaceDim, $transparency);
   $surfaceBright: transparentize($surfaceBright, $transparency);
-  $surfaceContainerLowest: transparentize($surfaceContainerLowest, $transparency);
+  $surfaceContainerLowest: transparentize(
+    $surfaceContainerLowest,
+    $transparency
+  );
   $surfaceContainerLow: transparentize($surfaceContainerLow, $transparency);
   $surfaceContainer: transparentize($surfaceContainer, $transparency);
   $surfaceContainerHigh: transparentize($surfaceContainerHigh, $transparency);
-  $surfaceContainerHighest: transparentize($surfaceContainerHighest, $transparency);
+  $surfaceContainerHighest: transparentize(
+    $surfaceContainerHighest,
+    $transparency
+  );
   $surfaceVariant: transparentize($surfaceVariant, $transparency);
   $inverseSurface: transparentize($inverseSurface, $transparency);
   $surfaceTint: transparentize($surfaceTint, $transparency);
+  $glass: transparentize(rgba(255, 255, 255, 0.1), $transparency);
 }
 
 // Others
@@ -22,10 +29,12 @@ $subtext: $outline;
 $actiontext: mix($onBackground, $background, 85%);
 $black: black;
 $white: white;
+$glass: rgba(0, 0, 0, 0);
 
 /// Color mappings for more chaotic, dynamic colors like the average rice ///
 // General
 $layer0: $background;
+$layer0lighter: mix($layer0, $onBackground, 90%);
 $onLayer0: $onBackground;
 $layer0Hover: mix($layer0, $onLayer0, 85%);
 $layer0Active: $surfaceContainerHigh;
@@ -37,7 +46,7 @@ $onLayer1Inactive: mix($onLayer1, $layer1, 45%);
 $onLayer1: $onSurfaceVariant;
 $layer2: mix($surfaceContainer, $surfaceContainerHigh, 55%);
 $onLayer2: $onSurface;
-$layer3: mix($surfaceContainerHigh, $onSurface, 96%);
+$layer3: $surfaceContainerHigh;
 $onLayer3: $onSurface;
 $layer1Hover: mix($layer1, $onLayer1, 85%);
 $layer1Active: mix($layer1, $onLayer1, 70%);
@@ -75,25 +84,24 @@ $workspaceOnLayer2: $onSecondaryContainer;
 $trayOnLayer0: $onLayer0;
 $cheatsheetTitle: $onSecondaryContainer;
 $cheatsheetColors: (
-    $onSecondaryContainer,
-    $onSecondaryContainer,
-    $onSecondaryContainer,
-    $onSecondaryContainer,
-    $onSecondaryContainer,
-    $onSecondaryContainer,
-    $onSecondaryContainer,
-    $onSecondaryContainer
+  $onSecondaryContainer,
+  $onSecondaryContainer,
+  $onSecondaryContainer,
+  $onSecondaryContainer,
+  $onSecondaryContainer,
+  $onSecondaryContainer,
+  $onSecondaryContainer,
+  $onSecondaryContainer
 );
 
 $sessionColors: (
-    $onLayer1,
-    $onLayer1,
-    $onLayer1,
-    $onLayer1,
-    $onLayer1,
-    $onLayer1,
-    $onLayer1
+  $onLayer1,
+  $onLayer1,
+  $onLayer1,
+  $onLayer1,
+  $onLayer1,
+  $onLayer1,
+  $onLayer1
 );
 $brightnessOnLayer0: $onLayer0;
 $volumeOnLayer0: $onLayer0;
-

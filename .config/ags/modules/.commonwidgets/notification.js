@@ -8,75 +8,38 @@ import { setupCursorHover } from "../.widgetutils/cursorhover.js";
 import { AnimatedCircProg } from "./cairo_circularprogress.js";
 
 function guessMessageType(summary) {
-    const keywordsToTypes = {
-        'reboot': 'restart_alt',
-        'recording': 'screen_record',
-        'battery': 'power',
-        'power': 'power',
-        'screenshot': 'screenshot_monitor',
-        'welcome': 'waving_hand',
-        'time': 'scheduleb',
-        'installed': 'download',
-        'update': 'update',
-        'ai response': 'neurology',
-        'startswith:file': 'folder_copy', // Declarative startsWith check
-    };
-
-    const lowerSummary = summary.toLowerCase();
-
-    for (const [keyword, type] of Object.entries(keywordsToTypes)) {
-        if (keyword.startsWith('startswith:')) {
-            const startsWithKeyword = keyword.replace('startswith:', '');
-            if (lowerSummary.startsWith(startsWithKeyword)) {
-                return type;
-            }
-        } else if (lowerSummary.includes(keyword)) {
-            return type;
-        }
-    }
-
+    const str = summary.toLowerCase();
+    if (str.includes('reboot')) return 'restart_alt';
+    if (str.includes('recording')) return 'screen_record';
+    if (str.includes('battery') || summary.includes('power')) return 'power';
+    if (str.includes('screenshot')) return 'screenshot_monitor';
+    if (str.includes('welcome')) return 'waving_hand';
+    if (str.includes('time')) return 'scheduleb';
+    if (str.includes('installed')) return 'download';
+    if (str.includes('update')) return 'update';
+    if (str.startsWith('file')) return 'folder_copy';
     return 'chat';
 }
 
-function processNotificationBody(body, appEntry) {
-    // Only process Chrome/Chromium notifications
-    if (appEntry?.toLowerCase().includes('chrome')) {
-        // Remove the first line
-        return body.split('\n\n').slice(1).join('\n\n');
-    }
-    return body;
+function exists(widget) {
+    return widget !== null;
 }
 
 const getFriendlyNotifTimeString = (timeObject) => {
     const messageTime = GLib.DateTime.new_from_unix_local(timeObject);
     const oneMinuteAgo = GLib.DateTime.new_now_local().add_seconds(-60);
     if (messageTime.compare(oneMinuteAgo) > 0)
-        return getString('Now');
+        return 'Now';
     else if (messageTime.get_day_of_year() == GLib.DateTime.new_now_local().get_day_of_year())
         return messageTime.format(userOptions.time.format);
     else if (messageTime.get_day_of_year() == GLib.DateTime.new_now_local().get_day_of_year() - 1)
-        return getString('Yesterday');
+        return 'Yesterday';
     else
         return messageTime.format(userOptions.time.dateFormat);
 }
 
 const NotificationIcon = (notifObject) => {
-
-    if (notifObject.hints?.image_path?.deepUnpack) {
-        const imagePath = notifObject.hints.image_path.deepUnpack();
-        return Box({
-            valign: Gtk.Align.CENTER,
-            hexpand: false,
-            className: 'notif-icon',
-            css: `
-                background-image: url("${imagePath}");
-                background-size: auto 100%;
-                background-repeat: no-repeat;
-                background-position: center;
-            `,
-        });
-    }
-
+    // { appEntry, appIcon, image }, urgency = 'normal'
     if (notifObject.image) {
         return Box({
             valign: Gtk.Align.CENTER,
@@ -142,11 +105,6 @@ export default ({
         }, wholeThing);
     }
     const widget = EventBox({
-        onHover: (self) => {
-            self.window.set_cursor(Gdk.Cursor.new_from_name(display, 'grab'));
-            if (!wholeThing.attribute.hovered)
-                wholeThing.attribute.hovered = true;
-        },
         onHoverLost: (self) => {
             self.window.set_cursor(null);
             if (wholeThing.attribute.hovered)
@@ -158,16 +116,13 @@ export default ({
         onMiddleClick: (self) => {
             destroyWithAnims();
         },
-        onSecondaryClick: (self) => {
-            expanded = !expanded;
-            notifTextPreview.revealChild = !expanded;
-            notifTextExpanded.revealChild = expanded;
-            notifExpandButton.child.label = `expand_${expanded ? 'less' : 'more'}`;
-        },
         setup: (self) => {
-            self.on("button-press-event", () => {
+            self.on("button-press-event", (self) => {
                 wholeThing.attribute.held = true;
                 notificationContent.toggleClassName(`${isPopup ? 'popup-' : ''}notif-clicked-${notifObject.urgency}`, true);
+                self.window.set_cursor(Gdk.Cursor.new_from_name(display, 'grab'));
+                if (!wholeThing.attribute.hovered)
+                    wholeThing.attribute.hovered = true;    
                 Utils.timeout(800, () => {
                     if (wholeThing?.attribute.held) {
                         Utils.execAsync(['wl-copy', `${notifObject.body}`]).catch(print);
@@ -178,7 +133,7 @@ export default ({
             }).on("button-release-event", () => {
                 wholeThing.attribute.held = false;
                 notificationContent.toggleClassName(`${isPopup ? 'popup-' : ''}notif-clicked-${notifObject.urgency}`, false);
-            })
+            });
         }
     });
     let wholeThing = Revealer({
@@ -211,7 +166,7 @@ export default ({
             justify: Gtk.Justification.LEFT,
             maxWidthChars: 1,
             truncate: 'end',
-            label: processNotificationBody(notifObject.body, notifObject.appEntry).split("\n")[0]
+            label: notifObject.body.split("\n")[0],
         }),
     });
     const notifTextExpanded = Revealer({
@@ -230,7 +185,7 @@ export default ({
                     justify: Gtk.Justification.LEFT,
                     maxWidthChars: 1,
                     wrap: true,
-                    label: processNotificationBody(notifObject.body, notifObject.appEntry)
+                    label: notifObject.body,
                 }),
                 Box({
                     className: 'notif-actions spacing-h-5',
@@ -240,18 +195,14 @@ export default ({
                             className: `notif-action notif-action-${notifObject.urgency}`,
                             onClicked: () => destroyWithAnims(),
                             setup: setupCursorHover,
-                            child: Label({
-                                label: getString('Close'),
-                            }),
+                            label: 'Close',
                         }),
                         ...notifObject.actions.map(action => Widget.Button({
                             hexpand: true,
                             className: `notif-action notif-action-${notifObject.urgency}`,
-                            onClicked: () => notifObject.invoke(action.id),
+                            onClicked: () => notifObject.invoke(action.id), // This comment is an anchor
                             setup: setupCursorHover,
-                            child: Label({
-                                label: action.label,
-                            }),
+                            label: action.label,
                         }))
                     ],
                 })
@@ -472,7 +423,7 @@ export default ({
                     }, wholeThing);
                 }
                 else {
-                    self.setCss(`transition: ${userOptions.animations.durationSmall}ms cubic-bezier(0.05, 0.7, 0.1, 1), opacity ${userOptions.animations.durationSmall}ms cubic-bezier(0.05, 0.7, 0.1, 1);
+                    self.setCss(`transition: margin 200ms cubic-bezier(0.05, 0.7, 0.1, 1), opacity 200ms cubic-bezier(0.05, 0.7, 0.1, 1);
                                    margin-left:  ${startMargin}px;
                                    margin-right: ${startMargin}px;
                                    margin-bottom: unset; margin-top: unset;
@@ -490,7 +441,7 @@ export default ({
     widget.add(notificationBox);
     wholeThing.child.children = [widget];
     if (isPopup) Utils.timeout(popupTimeout, () => {
-        if (wholeThing && !wholeThing.attribute.hovered) {
+        if (wholeThing) {
             wholeThing.revealChild = false;
             Utils.timeout(userOptions.animations.durationSmall, () => {
                 if (wholeThing) {
@@ -503,3 +454,4 @@ export default ({
     })
     return wholeThing;
 }
+

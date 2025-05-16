@@ -1,19 +1,20 @@
-const { GLib, Gtk } = imports.gi;
+const { GLib } = imports.gi;
 import App from "resource:///com/github/Aylur/ags/app.js";
 import * as Utils from "resource:///com/github/Aylur/ags/utils.js";
 import Widget from "resource:///com/github/Aylur/ags/widget.js";
 import { IconTabContainer } from "../.commonwidgets/tabcontainer.js";
-const { Box, Label, Scrollable } = Widget;
+const { Box, Label } = Widget;
 
+const CONFIG_DIR = GLib.get_user_config_dir();
 const HYPRLAND_KEYBIND_CONFIG_FILE = userOptions.cheatsheet.keybinds.configPath ?
-    userOptions.cheatsheet.keybinds.configPath : `${GLib.get_user_config_dir()}/hypr/hyprland/keybinds.conf`;
+    userOptions.cheatsheet.keybinds.configPath : `${CONFIG_DIR}/hypr/hyprland/keybinds.conf`;
 const KEYBIND_SECTIONS_PER_PAGE = 3;
 const getKeybindList = () => {
     let data = Utils.exec(`${App.configDir}/scripts/hyprland/get_keybinds.py --path ${HYPRLAND_KEYBIND_CONFIG_FILE}`);
     if (data == "\"error\"") {
         Utils.timeout(2000, () => Utils.execAsync(['notify-send',
-            'Update path to keybinds',
-            'Keybinds hyprland config file not found. Check your user options.',
+        'Update path to keybinds',
+        'Keybinds hyprland config file not found. Check your user options.',
             '-a', 'ags',
         ]).catch(print))
         return { children: [] };
@@ -45,7 +46,7 @@ const Keybind = (keybindData, type) => { // type: either "keys" or "actions"
     });
     const Action = (text) => Label({ // Binds
         xalign: 0,
-        label: getString(text),
+        label: text,
         className: "txt txt-small cheatsheet-action",
     })
     return Widget.Box({
@@ -74,7 +75,7 @@ const Section = (sectionData, scope) => {
     const name = Label({
         xalign: 0,
         className: "cheatsheet-category-title txt margin-bottom-10",
-        label: getString(sectionData.name),
+        label: sectionData.name,
     })
     const binds = Box({
         className: 'spacing-h-10',
