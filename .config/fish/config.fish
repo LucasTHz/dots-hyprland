@@ -17,26 +17,28 @@ if status is-interactive # Commands to run in interactive sessions can go here
         cat ~/.local/state/quickshell/user/generated/terminal/sequences.txt
     end
 
-starship init fish | source
-if test -f ~/.local/state/quickshell/user/generated/terminal/sequences.txt
-    cat ~/.local/state/quickshell/user/generated/terminal/sequences.txt
+    starship init fish | source
+    if test -f ~/.local/state/quickshell/user/generated/terminal/sequences.txt
+        cat ~/.local/state/quickshell/user/generated/terminal/sequences.txt
+    end
+
+    alias pamcan=pamcan
+    alias php="mise exec -- php"
+    alias yarn="mise exec -- yarn"
+    alias node="mise exec -- node"
+    alias pipx="mise exec -- pipx"
+    alias npm="mise exec -- npm"
+alias npx="mise exec -- npx"
+    alias composer="mise exec -- composer"
+    alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
+    alias pamcan pacman
+    alias ls 'eza --icons'
+    alias clear "printf '\033[2J\033[3J\033[1;1H'"
+    alias q 'qs -c ii'
+    set -gx ANDROID_HOME $HOME/Android/sdk
+    set -gx ANDROID_SDK_ROOT $HOME/Android/sdk
+    set -gx PATH $PATH $ANDROID_HOME/cmdline-tools/latest/bin
+    set -gx PATH $PATH $ANDROID_HOME/platform-tools
+    set -gx PATH $PATH $ANDROID_HOME/emulator
+
 end
-
-alias pamcan=pamcan
-alias php="mise exec -- php"
-alias yarn="mise exec -- yarn"
-alias node="mise exec -- node"
-alias pipx="mise exec -- pipx"
-alias npm="mise exec -- npm"
-alias composer="mise exec -- composer"
-alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
-alias pamcan pacman
-alias ls 'eza --icons'
-alias clear "printf '\033[2J\033[3J\033[1;1H'"
-alias q 'qs -c ii'
-
-
-# function fish_prompt
-#   set_color cyan; echo (pwd)
-#   set_color green; echo '> '
-# end
