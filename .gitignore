@@ -3,4 +3,6 @@
 # Ignore Python cache files
 __pycache__/
 *.py[cod]
-.config/quickshell/ii/.qmlls.ini
+dots/.config/quickshell/ii/.qmlls.ini
+.update-lock
+/os-release
