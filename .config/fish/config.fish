@@ -40,5 +40,5 @@ alias npx="mise exec -- npx"
     set -gx PATH $PATH $ANDROID_HOME/cmdline-tools/latest/bin
     set -gx PATH $PATH $ANDROID_HOME/platform-tools
     set -gx PATH $PATH $ANDROID_HOME/emulator
-
 end
+~/.local/bin/mise activate fish | source
