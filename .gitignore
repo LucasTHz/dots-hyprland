@@ -6,3 +6,4 @@ __pycache__/
 dots/.config/quickshell/ii/.qmlls.ini
 .update-lock
 /os-release
+dist-arch/
