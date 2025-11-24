@@ -42,3 +42,4 @@ alias npx="mise exec -- npx"
     set -gx PATH $PATH $ANDROID_HOME/emulator
 end
 ~/.local/bin/mise activate fish | source
+set -x SSH_AUTH_SOCK $XDG_RUNTIME_DIR/ssh-agent.socket
