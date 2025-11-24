@@ -1,9 +1,18 @@
 /diagnose.result
 /cache
+
 # Ignore Python cache files
 __pycache__/
 *.py[cod]
-dots/.config/quickshell/ii/.qmlls.ini
-.update-lock
+
+/dots/.config/quickshell/ii/.qmlls.ini
+
+# exp-update
+/.update-lock
+
+# custom os-release
 /os-release
 dist-arch/
+
+# Emacs auto backup file
+*~
