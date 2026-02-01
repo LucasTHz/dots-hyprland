@@ -43,3 +43,5 @@ alias npx="mise exec -- npx"
 end
 ~/.local/bin/mise activate fish | source
 set -x SSH_AUTH_SOCK $XDG_RUNTIME_DIR/ssh-agent.socket
+
+fish_add_path /home/thomaz/.spicetify
