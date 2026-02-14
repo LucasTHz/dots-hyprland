@@ -45,3 +45,8 @@ end
 set -x SSH_AUTH_SOCK $XDG_RUNTIME_DIR/ssh-agent.socket
 
 fish_add_path /home/thomaz/.spicetify
+
+
+# Added by ToolHive UI - do not modify this block
+fish_add_path -g $HOME/.toolhive/bin
+# End ToolHive UI
