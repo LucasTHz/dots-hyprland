@@ -28,12 +28,16 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias node="mise exec -- node"
     alias pipx="mise exec -- pipx"
     alias npm="mise exec -- npm"
-alias npx="mise exec -- npx"
+    alias npx="mise exec -- npx"
     alias composer="mise exec -- composer"
     alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
     alias pamcan pacman
+    # Aliases
+    alias clear "printf '\033[2J\033[3J\033[1;1H'" # fix: kitty doesn't clear properly
+    alias celar "printf '\033[2J\033[3J\033[1;1H'"
+    alias claer "printf '\033[2J\033[3J\033[1;1H'"
     alias ls 'eza --icons'
-    alias clear "printf '\033[2J\033[3J\033[1;1H'"
+    alias pamcan pacman
     alias q 'qs -c ii'
     set -gx ANDROID_HOME $HOME/Android/sdk
     set -gx ANDROID_SDK_ROOT $HOME/Android/sdk
@@ -43,3 +47,10 @@ alias npx="mise exec -- npx"
 end
 ~/.local/bin/mise activate fish | source
 set -x SSH_AUTH_SOCK $XDG_RUNTIME_DIR/ssh-agent.socket
+
+fish_add_path /home/thomaz/.spicetify
+
+
+# Added by ToolHive UI - do not modify this block
+fish_add_path -g $HOME/.toolhive/bin
+# End ToolHive UI
