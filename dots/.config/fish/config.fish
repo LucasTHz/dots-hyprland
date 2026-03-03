@@ -48,9 +48,15 @@ end
 ~/.local/bin/mise activate fish | source
 set -x SSH_AUTH_SOCK $XDG_RUNTIME_DIR/ssh-agent.socket
 
-fish_add_path /home/thomaz/.spicetify
+fish_add_path  $HOME/.spicetify
 
 
 # Added by ToolHive UI - do not modify this block
 fish_add_path -g $HOME/.toolhive/bin
 # End ToolHive UI
+
+# opencode
+fish_add_path  $HOME/.opencode/bin
+
+# Added by LM Studio CLI tool (lms)
+set -gx PATH $PATH  $HOME/.lmstudio/bin
