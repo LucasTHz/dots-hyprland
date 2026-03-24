@@ -39,24 +39,40 @@ if status is-interactive # Commands to run in interactive sessions can go here
     alias ls 'eza --icons'
     alias pamcan pacman
     alias q 'qs -c ii'
+    alias conda="/opt/anaconda/bin/conda"
+    alias pnpm="mise exec -- pnpm"
+    alias gemini="mise exec -- gemini"
+    alias python="mise exec -- python"
     set -gx ANDROID_HOME $HOME/Android/sdk
     set -gx ANDROID_SDK_ROOT $HOME/Android/sdk
     set -gx PATH $PATH $ANDROID_HOME/cmdline-tools/latest/bin
     set -gx PATH $PATH $ANDROID_HOME/platform-tools
     set -gx PATH $PATH $ANDROID_HOME/emulator
 end
-~/.local/bin/mise activate fish | source
-set -x SSH_AUTH_SOCK $XDG_RUNTIME_DIR/ssh-agent.socket
 
-fish_add_path  $HOME/.spicetify
-
+fish_add_path $HOME/.spicetify
 
 # Added by ToolHive UI - do not modify this block
 fish_add_path -g $HOME/.toolhive/bin
 # End ToolHive UI
 
 # opencode
-fish_add_path  $HOME/.opencode/bin
+fish_add_path $HOME/.opencode/bin
 
 # Added by LM Studio CLI tool (lms)
-set -gx PATH $PATH  $HOME/.lmstudio/bin
+set -gx PATH $PATH $HOME/.lmstudio/bin
+export PATH="$HOME/.local/bin:$PATH"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+if test -f /opt/anaconda/bin/conda
+    eval /opt/anaconda/bin/conda "shell.fish" "hook" $argv | source
+else
+    if test -f "/opt/anaconda/etc/fish/conf.d/conda.fish"
+        . "/opt/anaconda/etc/fish/conf.d/conda.fish"
+    else
+        set -x PATH "/opt/anaconda/bin" $PATH
+    end
+end
+# <<< conda initialize <<<
+
